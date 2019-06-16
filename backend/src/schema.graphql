@@ -14,9 +14,19 @@ type Mutation {
     image: String
     largeImage: String
   ): Item!
+
+  updateItem(
+    id: ID!
+    title: String
+    description: String
+    price: Int # TODO: Figure out how to update the image.
+  ): Item!
+
+  deleteItem(id: ID!): Item!
 }
 
 type Query {
   items: [Item]!
   users: [User]!
+  item(where: ItemWhereUniqueInput!): Item
 }
