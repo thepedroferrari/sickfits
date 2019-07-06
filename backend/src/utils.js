@@ -14,4 +14,29 @@ function hasPermission(user, permissionsNeeded) {
   }
 }
 
-exports.hasPermission = hasPermission;
+
+
+
+const SECOND = 1000
+const MINUTE = SECOND * 60
+const HOUR = MINUTE * 60
+const DAY = HOUR * 24
+const WEEK = DAY * 7
+const MONTH = DAY * 30
+const YEAR = DAY * 365
+
+
+
+
+
+
+
+exports.hasPermission = hasPermission
+
+exports.SECOND = SECOND
+exports.MINUTE = MINUTE
+exports.HOUR = HOUR
+exports.DAY = DAY
+exports.WEEK = WEEK
+exports.MONTH = MONTH
+exports.YEAR = YEAR
