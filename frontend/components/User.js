@@ -2,13 +2,13 @@ import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 import propTypes from 'prop-types'
 
+//TODO: FIX permissions
 const CURRENT_USER_QUERY = gql`
   query {
     me {
       id
       email
       name
-      permissions
     }
   }
 `

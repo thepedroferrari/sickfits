@@ -6,6 +6,10 @@ type User {
   email: String!
 }
 
+type SuccessMessage {
+  message: String
+}
+
 type Mutation {
   createItem(
     title: String
@@ -29,6 +33,14 @@ type Mutation {
     password: String!,
     name: String!
   ): User!
+
+  signin(
+    email: String!,
+    password: String!
+  ): User!
+
+  signout: SuccessMessage
+
 }
 
 type Query {
