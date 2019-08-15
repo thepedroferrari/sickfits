@@ -115,7 +115,14 @@ const Mutations = {
     // 3. Email them that reset token
   },
 
-  async resetPassword(parent, { password, confirmPassword, resetToken }, ctx, info) {
+  async resetPassword(
+    parent,
+    {
+      password,
+      confirmPassword,
+      resetToken,
+      resetTokenExpiry,
+      permissions }, ctx, info) {
     // 1. Check if passwords match
     if (password !== confirmPassword) {
       throw new Error(`Password "${password}" does not match the confirm password "${confirmPassword}"`)
