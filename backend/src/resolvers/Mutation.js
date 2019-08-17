@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const { HOUR, YEAR } = require('../utils')
 const { randomBytes } = require('crypto')
 const { promisify } = require('util')
+const { transport, makeANiceEmail } = require('../mail')
 
 const Mutations = {
   async createItem(parent, args, ctx, info) {
@@ -111,18 +112,26 @@ const Mutations = {
       data: { resetToken, resetTokenExpiry }
     })
     console.log(res)
-    return { message: 'Thanks!' }
     // 3. Email them that reset token
+    const tokenExpiryNiceDate = new Date(resetTokenExpiry).toString()
+    const mailRes = await transport.sendMail({
+      from: 'pedro@pedroferrari.com',
+      to: user.email,
+      subject: 'Your Password Reset Token',
+      html: makeANiceEmail(`
+        Your password reset token is here!
+        <br><br>
+        <a href="${process.env.FRONTEND_URL}/reset?resetToken=${resetToken}">Click here to reset</a>
+        <br>
+        Your token is valid until <strong>${tokenExpiryNiceDate}</strong>
+      `)
+    })
+
+    // 4. Return the Message
+    return { message: 'Thanks!' }
   },
 
-  async resetPassword(
-    parent,
-    {
-      password,
-      confirmPassword,
-      resetToken,
-      resetTokenExpiry,
-      permissions }, ctx, info) {
+  async resetPassword(parent, { password, confirmPassword, resetToken }, ctx, info) {
     // 1. Check if passwords match
     if (password !== confirmPassword) {
       throw new Error(`Password "${password}" does not match the confirm password "${confirmPassword}"`)
@@ -140,16 +149,14 @@ const Mutations = {
       throw new Error('this token is either invalid or expired!')
     }
     // 4. hash their new password
-    const newPassword = await bcrypt.hash(password, 10)
+    const updatedPassword = await bcrypt.hash(password, 10)
     // 5. Save the new password to the user and remove old reset token fields
     const updatedUser = await ctx.db.mutation.updateUser({
-      where: {
-        email: user.email,
-        data: {
-          newPassword,
-          resetToken: null,
-          resetTokenExpiry: null
-        }
+      where: { email: user.email },
+      data: {
+        password: updatedPassword,
+        resetToken: null,
+        resetTokenExpiry: null
       }
     })
     // 6. Generate JWT
@@ -161,7 +168,7 @@ const Mutations = {
     })
     // 8. return the new user
     return updatedUser
-  }
-};
+  },
+}
 
 module.exports = Mutations;
